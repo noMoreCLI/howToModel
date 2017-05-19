@@ -1,12 +1,12 @@
-#Building Application Profiles in CloudCenter
+# Building Application Profiles in CloudCenter
 
-##Building your first Application
+## Building your first Application
 We will explore the basic principle of creating a custom Application Profile to deploy a simple application called "NextCloud" based on [this](https://nextcloud.com) 
 
 We do assume that your CloudCenter environment is already setup and that you're able to deploy the built-in services to at least one target cloud environment.
 After 8 Steps your application will be modeled and ready for deployment, although we recommend for production some additional tweaks add security.
 
-###Step 1: Top-Down Modeling 
+### Step 1: Top-Down Modeling 
 As I'm writing here on how I modeled the NextCloud Application I've chosen a more Top-Down modeling approach. However, building the application and services was performed using a bottom-up aproach with many deployments and errors. So we do here some mixture of both approaches, as I think this is helpful. Especially if you're following these steps to build you own application profile.
 
 First we check the documenation of NextCloud in regards of the deployment requirements. Althought there are a couple of options, we settled down on the following ones in **bold**:
@@ -25,7 +25,7 @@ For CloudCenter we do translate this into an N-Tier Application Profile with 2 T
 Good News, after careful checking I figured out that we don't need to create any new images or services. Less work and reusing existing images is according to best practices!
 But do the existing WebServer- and DataBase-Versions, modules and libraries in these images, fit the requirments? Let's find out!
 
-###Step 2:Check Requirements and start an empty deployment
+### Step 2:Check Requirements and start an empty deployment
 If you're working the first time with a service it might be difficult to understand the detailed configuration and setup. Hence deploying an empty service without and customization gives you an easy way to build and test your deployment script.
 
 ![Application Modeler](./images/CC1.png)
@@ -39,16 +39,16 @@ Now let's build a skeleton of our app. Draging an Apache Webserver and a MySQL D
 
 With that - You're ready to hit the first deployment.
 
-###Step 3:Logging In, Check Version, Test first modifications
+### Step 3:Logging In, Check Version, Test first modifications
 CloudCenter makes it very easy to access your deployed machines regardless of their physical location.
 
 ![Application Modeler](./images/CC12.png)
 
-**Apache Web Server**  
+** Apache Web Server **  
 All required modules are installed, however the php version is outdated. So one of the first steps we have to fix is updating php. As in our setup the apache webserver is based on a CentOs, the corresponding script is specific to the linux distribution used. More advanced shell scripters can overcome this, however this not scope of Cloudcenter nor this blog.
 
 
-###Step 4:Modifing Apache Web Service using a script
+### Step 4:Modifing Apache Web Service using a script
 
 The Script for adjusting the WebService to the NextCloud requirements is easy, and we do some additional steps as well:
 
@@ -106,7 +106,7 @@ This is a one-time action which needs to be done upon deployment. After re-visit
 ![Application Modeler](./images/CC2.png)
 
 
-###Step 5:Configuring the DB
+### Step 5:Configuring the DB
 As the MySQL Service is satisfying all requirments out of the box, I only have to create the root password and the initial DB schema based on the NextCloud installation steps. The SQL script can be passed directly to the service.
 
 	CREATE DATABASE IF NOT EXISTS cloud;
@@ -117,7 +117,7 @@ Please note that in this Application Profile the DB user, password and name are 
 
 ![Application Modeler](./images/CC8.png) 
 
-###Step 6:Configuring NextCloud
+### Step 6:Configuring NextCloud
 
 With that, we have the application deployed, however, the application is not yet configured. As we don't want the user to see an initial confiuration dialog  where he has to enter db server, users etc, we're going to pre-configure the Application. CloudCenter has already the majority of required information such as IP addresses of the hosts. And the missing information we can add easily as application parameters to the profile and ask the user for input before the deployment.  
 
@@ -164,7 +164,7 @@ postConfig.sh
 
 This script we add in the section **"Service Initialization" - "Post-Start Script"**
 
-###Step 7:adding a digital certificat
+### Step 7:adding a digital certificat
 
 Let's add a self signed certificate to the webserver with the correct hostname. We can easily do that in such a way...
 
@@ -195,13 +195,13 @@ Adding a custom logo, set the correct Description and Version is the last step w
 
 ![Application Modeler](./images/CC11.png) 
 
-###Run a test
+### Run a test
 So, by now all should be ready and we can deploy the application through CloudCenter. If all wen't well, the deployments are on green and you can access the app through the browser.
 
 ![Application Modeler](./images/CC13.png) 
 ![Application Modeler](./images/CC14.png) 
 
 
-###Conclusion
+### Conclusion
 CloudCenter offers a flexible way to standardize your application deployments. On top of that, once the application deployment has been integrated with CloudCenter you get the freedom of deploying your application in multiple destionation. We take off the worries of cloud specific implemenations and let you concentrate on the deployment of your applications.
 
