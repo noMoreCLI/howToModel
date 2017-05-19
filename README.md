@@ -7,13 +7,13 @@ We do assume that your CloudCenter environment is already setup and that you're 
 After 8 Steps your application will be modeled and ready for deployment, although we recommend for production some additional tweaks add security.
 
 ### Step 1: Top-Down Modeling 
-As I'm writing here on how I modeled the NextCloud Application I've chosen a more Top-Down modeling approach. However, building the application and services was performed using a bottom-up aproach with many deployments and errors. So we do here some mixture of both approaches, as I think this is helpful. Especially if you're following these steps to build you own application profile.
+As I'm writing here on how I modeled the NextCloud Application I've chosen a more Top-Down modeling approach. However, building the application and services was performed using a bottom-up approach with many deployments and errors. So, we do here some mixture of both approaches, as I think this is helpful. Especially if you're following these steps to build you own application profile.
 
-First we check the documenation of NextCloud in regards of the deployment requirements. Althought there are a couple of options, we settled down on the following ones in **bold**:
+First, we check the documentation of NextCloud in regards of the deployment requirements. Although there are a couple of options, we settled down on the following ones in **bold**:
 
 - OS: Red Hat Enterprise Linux 7 / Ubuntu 16.04 LTS recommended, Linux (Debian 7, SUSE Linux Enterprise Server 11 SP3 & 12, Red Hat Enterprise Linux/**CentOS 6.5** and 7 (7 is 64-bit only), Ubuntu 14.04 LTS, 16.04 LTS)
 - Memory: 128MB to **512MB**
-- Dedictaed Web server: **Apache 2 (mod_php, php-fpm)** or Nginx (php-fpm)
+- Dedicated Web server: **Apache 2 (mod_php, php-fpm)** or Nginx (php-fpm)
 - Dedicated Databases: **MySQL/MariaDB 5.5+** ; PostgreSQL; Oracle 11g 
 - PHP 5.6 + required
 
@@ -23,9 +23,9 @@ For CloudCenter we do translate this into an N-Tier Application Profile with 2 T
 - Database Tier, where we use the existing MySQL Service
 
 Good News, after careful checking I figured out that we don't need to create any new images or services. Less work and reusing existing images is according to best practices!
-But do the existing WebServer- and DataBase-Versions, modules and libraries in these images, fit the requirments? Let's find out!
+But do the existing WebServer- and DataBase-Versions, modules and libraries in these images, fit the requirements? Let's find out!
 
-### Step 2:Check Requirements and start an empty deployment
+### Step 2: Check Requirements and start an empty deployment
 If you're working the first time with a service it might be difficult to understand the detailed configuration and setup. Hence deploying an empty service without and customization gives you an easy way to build and test your deployment script.
 
 ![Application Modeler](./images/CC1.png)
@@ -33,13 +33,13 @@ If you're working the first time with a service it might be difficult to underst
 To tell CloudCenter to keep the application also in the case of a failure, we can add a single global parameter (can be visible to the enduser, but is not required to). On the "Global Parameter" tab we can add the parameter ==cliqrIgnoreAppFailuer=True==.
 ![Application Modeler](./images/CC7.png)
 
-During the development phase I encurage you to do this to see where things got wrong. While speaking of things going wrong, make sure your scripts do some sort of extensive logging - maybe as well based on a global parameter which is passed as an envrionment variable to your application stacks. But this is just an idea...
+During the development phase I encourage you to do this to see where things got wrong. While speaking of things going wrong, make sure your scripts do some sort of extensive logging - maybe as well based on a global parameter which is passed as an environment variable to your application stacks. But this is just an idea...
 
 Now let's build a skeleton of our app. Draging an Apache Webserver and a MySQL Database into the topology. Then draw an arrow from the web server to the database. This will tell Cloudcenter the correct dependency - the MySQL DB must be ready before we start the web service. 
 
 With that - You're ready to hit the first deployment.
 
-### Step 3:Logging In, Check Version, Test first modifications
+### Step 3: Logging In, Check Version, Test first modifications
 CloudCenter makes it very easy to access your deployed machines regardless of their physical location.
 
 ![Application Modeler](./images/CC12.png)
@@ -48,11 +48,11 @@ CloudCenter makes it very easy to access your deployed machines regardless of th
 All required modules are installed, however the php version is outdated. So one of the first steps we have to fix is updating php. As in our setup the apache webserver is based on a CentOs, the corresponding script is specific to the linux distribution used. More advanced shell scripters can overcome this, however this not scope of Cloudcenter nor this blog.
 
 
-### Step 4:Modifing Apache Web Service using a script
+### Step 4: Modifing Apache Web Service using a script
 
 The Script for adjusting the WebService to the NextCloud requirements is easy, and we do some additional steps as well:
 
-- Source the CloudCenter environment to access envrionment variables and other information
+- Source the CloudCenter environment to access environment variables and other information
 - Removing old php version from service
 - add new Repo required for PHP 5.6 and install the required packages
 - creating the required directories for NextCloud according to the documentation
@@ -65,7 +65,7 @@ In the Properties Section of the apache webserver we provide the basic informati
 
 For the successful installation of the application package I needed to adjust some things on the webserver:
 
-- Source the CloudCenter environment to access envrionment variables and other information
+- Source the CloudCenter environment to access environment variables and other information
 - Removing old php version from service
 - add new Repo required for PHP 5.6 and install the required packages
 - creating the required directories for NextCloud according to the documentation
@@ -107,7 +107,7 @@ This is a one-time action which needs to be done upon deployment. After re-visit
 
 
 ### Step 5:Configuring the DB
-As the MySQL Service is satisfying all requirments out of the box, I only have to create the root password and the initial DB schema based on the NextCloud installation steps. The SQL script can be passed directly to the service.
+As the MySQL Service is satisfying all requirements out of the box, I only have to create the root password and the initial DB schema based on the NextCloud installation steps. The SQL script can be passed directly to the service.
 
 	CREATE DATABASE IF NOT EXISTS cloud;
 	CREATE USER 'nextcloud'@'%' IDENTIFIED BY 'nextpassword';
@@ -117,13 +117,13 @@ Please note that in this Application Profile the DB user, password and name are 
 
 ![Application Modeler](./images/CC8.png) 
 
-### Step 6:Configuring NextCloud
+### Step 6: Configuring NextCloud
 
-With that, we have the application deployed, however, the application is not yet configured. As we don't want the user to see an initial confiuration dialog  where he has to enter db server, users etc, we're going to pre-configure the Application. CloudCenter has already the majority of required information such as IP addresses of the hosts. And the missing information we can add easily as application parameters to the profile and ask the user for input before the deployment.  
+With that, we have the application deployed, however, the application is not yet configured. As we don't want the user to see an initial configuration dialog  where he has to enter db server, users etc, we're going to pre-configure the Application. CloudCenter has already the majority of required information such as IP addresses of the hosts. And the missing information we can add easily as application parameters to the profile and ask the user for input before the deployment.  
 
 ![Application Modeler](./images/CC10.png) 
 
-Hence we're adding the folling parameters in the application model, at the same place we added the CliqrIgnoreAppFailure:
+Hence we're adding the following parameters in the application model, at the same place we added the CliqrIgnoreAppFailure:
 
 - Admin User Name, named as NEXTCLOUD\_ADMIN\_USER
 - Admin User Password, named as NEXTCLOUD\_ADMIN\_PASS
@@ -164,7 +164,7 @@ postConfig.sh
 
 This script we add in the section **"Service Initialization" - "Post-Start Script"**
 
-### Step 7:adding a digital certificat
+### Step 7: adding a digital certificate
 
 Let's add a self signed certificate to the webserver with the correct hostname. We can easily do that in such a way...
 
@@ -196,7 +196,7 @@ Adding a custom logo, set the correct Description and Version is the last step w
 ![Application Modeler](./images/CC11.png) 
 
 ### Run a test
-So, by now all should be ready and we can deploy the application through CloudCenter. If all wen't well, the deployments are on green and you can access the app through the browser.
+So, by now all should be ready and we can deploy the application through CloudCenter. If all went well, the deployments are on green and you can access the app through the browser.
 
 ![Application Modeler](./images/CC13.png) 
 ![Application Modeler](./images/CC14.png) 
